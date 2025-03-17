@@ -1,0 +1,200 @@
+{% extends "base.html" %} {% block content %}
+    <h1 class="mb-4">{{ group.name }} - Users</h1>
+
+    <div class="d-flex gap-2 mb-3">
+        <a
+                href="{{ url_for('groups.add_user_to_group', group_id=group.id) }}"
+                class="btn btn-primary"
+        >
+            Add User
+        </a>
+        <a href="{{ url_for('groups.list_groups') }}" class="btn btn-secondary"
+        >Back to Groups</a
+        >
+    </div>
+
+    <table class="table table-hover table-striped">
+        <thead class="table-dark">
+        <tr>
+            <th>#</th>
+            <th>Username</th>
+            <th>Email</th>
+            <th>Active Until</th>
+            <th>Assigned Proxy</th>
+            <th>Actions</th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for user in group.users %}
+            <tr id="user-row-{{ user.id }}">
+                <td>{{ loop.index }}</td>
+                <td>{{ user.username }}</td>
+                <td>{{ user.email }}</td>
+                <td id="active-until-{{user.id}}">
+                    {% if user.disabled %}Not Active
+                    {% elif user.disabled_after %} {{ user.disabled_after.strftime("%Y-%m-%d %H:%M") }} {% else %} Not
+                        Set {% endif %}
+                </td>
+                <td>
+                    {{ user.get_proxy_hostname() or 'Not Assigned' }}
+                </td>
+                <td>
+                    <!-- Edit Button -->
+                    <a
+                            href="{{ url_for('users.edit_user', user_id=user.id) }}"
+                            class="btn btn-primary btn-sm"
+                    >
+                        Edit
+                    </a>
+
+                    <!-- Delete Button -->
+                    <form
+                            action="{{ url_for('users.delete_user', user_id=user.id) }}"
+                            method="post"
+                            class="d-inline"
+                    >
+                        <button
+                                class="btn btn-danger btn-sm"
+                                onclick="return confirm('Are you sure you want to delete this user?');"
+                        >
+                            Delete
+                        </button>
+                    </form>
+
+                    <!-- Suspend Button -->
+                    <button
+                            class="btn btn-warning btn-sm suspend-btn"
+                            data-id="{{ user.id }}"
+                    >
+                        Suspend
+                    </button>
+
+
+                    <!-- Extend Button -->
+                    <button
+                            type="button"
+                            class="btn btn-info btn-sm extend-btn"
+                            data-bs-toggle="modal"
+                            data-bs-target="#extendModal"
+                            data-id="{{ user.id }}"
+                    >
+                        Extend
+                    </button>
+
+
+                    <div class="modal fade" id="extendModal" tabindex="-1" aria-hidden="true">
+                        <div class="modal-dialog">
+                            <div class="modal-content">
+                                <form id="extend-user-form">
+                                    <div class="modal-header">
+                                        <h5 class="modal-title">Extend Active Time</h5>
+                                        <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                                aria-label="Close"></button>
+                                    </div>
+                                    <div class="modal-body">
+                                        <input type="hidden" id="extend-user-id"/>
+                                        <label for="disabled_after" class="form-label">Disabled After</label>
+                                        <input
+                                                type="datetime-local"
+                                                class="form-control"
+                                                id="disabled_after"
+                                                name="disabled_after"
+                                                required
+                                        />
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel
+                                        </button>
+                                        <button type="submit" class="btn btn-success">Save</button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+
+                </td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+
+    <script>
+        // Add event listener for Suspend buttons
+        document.addEventListener('DOMContentLoaded', () => {
+            // Suspend Button Click Handler
+            document.querySelectorAll('.suspend-btn').forEach((button) => {
+                button.addEventListener('click', () => {
+                    if (!confirm("Are you sure you want to suspend this user?"))
+                        return
+                    const userId = button.getAttribute('data-id');
+
+                    // AJAX request to suspend the user
+                    fetch('/users/suspend_user', {
+                        method: 'POST',
+                        headers: {'Content-Type': 'application/json'},
+                        body: JSON.stringify({user_id: userId}),
+                    })
+                        .then((response) => response.json())
+                        .then((data) => {
+                            if (data.success) {
+                                const activeUntilCell = document.getElementById(`active-until-${userId}`);
+                                activeUntilCell.innerText = 'Not Active';
+                                alert('User suspended successfully!');
+                            } else {
+                                alert('Failed to suspend user!');
+                            }
+                        })
+                        .catch((error) => {
+                            console.error('Error:', error);
+                            alert('An error occurred while suspending the user.');
+                        });
+                });
+            });
+        });
+
+        document.addEventListener('DOMContentLoaded', () => {
+            // Handle Extend Button Click
+            document.querySelectorAll('.extend-btn').forEach((button) => {
+                button.addEventListener('click', () => {
+                    const userId = button.getAttribute('data-id');
+                    document.getElementById('extend-user-id').value = userId;
+                });
+            });
+
+            // Handle Extend Form Submission
+            const extendForm = document.getElementById('extend-user-form');
+            extendForm.addEventListener('submit', (event) => {
+                event.preventDefault();
+
+                const userId = document.getElementById('extend-user-id').value;
+                const disabledAfter = document.getElementById('disabled_after').value;
+
+                fetch('/users/extend_user', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({user_id: userId, disabled_after: disabledAfter}),
+                })
+                    .then((response) => response.json())
+                    .then((data) => {
+                        if (data.success) {
+                            const activeUntilCell = document.getElementById(`active-until-${userId}`);
+                            activeUntilCell.innerText = new Date(disabledAfter).toLocaleString();
+                            alert('User active time extended successfully!');
+
+                            // Close the modal
+                            const modal = document.getElementById('extendModal');
+                            const modalInstance = bootstrap.Modal.getInstance(modal);
+                            modalInstance.hide();
+                        } else {
+                            alert('Failed to extend user active time!');
+                        }
+                    })
+                    .catch((error) => {
+                        console.error('Error:', error);
+                        alert('An error occurred while extending user active time.');
+                    });
+            });
+        });
+    </script>
+
+{% endblock %}

@@ -1,0 +1,21 @@
+{% extends "base.html" %} {% block content %}
+<h1 class="mb-4">Edit Group</h1>
+
+<form method="post">
+  <div class="mb-3">
+    <label for="name" class="form-label">Group Name</label>
+    <input
+      type="text"
+      class="form-control"
+      id="name"
+      name="name"
+      value="{{ group.name }}"
+      required
+    />
+  </div>
+  <button type="submit" class="btn btn-success">Save Changes</button>
+  <a href="{{ url_for('groups.list_groups') }}" class="btn btn-secondary"
+    >Cancel</a
+  >
+</form>
+{% endblock %}

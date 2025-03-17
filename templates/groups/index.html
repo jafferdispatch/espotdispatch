@@ -1,0 +1,50 @@
+{% extends "base.html" %} {% block content %}
+<h1 class="mb-4">User Groups</h1>
+
+<div class="d-flex justify-content-between mb-3">
+  <a href="{{ url_for('groups.add_group') }}" class="btn btn-primary"
+    >Add Group</a
+  >
+</div>
+
+<table class="table table-striped">
+  <thead>
+    <tr>
+      <th>Group Name</th>
+      <th>Actions</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for group in groups %}
+    <tr>
+      <td>{{ group.name }}</td>
+      <td>
+        <a
+          href="{{ url_for('groups.group_users', group_id=group.id) }}"
+          class="btn btn-info btn-sm"
+          >View Users</a
+        >
+        <a
+          href="{{ url_for('groups.edit_group', group_id=group.id) }}"
+          class="btn btn-warning btn-sm"
+          >Edit</a
+        >
+        <form
+          method="post"
+          action="{{ url_for('groups.delete_group', group_id=group.id) }}"
+          style="display: inline"
+        >
+          <button
+            type="submit"
+            class="btn btn-danger btn-sm"
+            onclick="return confirm('Are you sure you want to delete this group?');"
+          >
+            Delete
+          </button>
+        </form>
+      </td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+{% endblock %}

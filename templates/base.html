@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>{{ title if title else "Admin Panel" }}</title>
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='css/styles.css') }}"
+    />
+    <link
+      rel="icon"
+      href="{{ url_for('static', filename='images/logo.ico') }}"
+      type="image/x-icon"
+    />
+  </head>
+  <body>
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+      <div class="container-fluid">
+        <img
+          src="{{ url_for('static', filename='images/logo.ico') }}"
+          alt="Logo"
+          style="width: 2rem"
+          class="m-2 me-3"
+        />
+        <a class="navbar-brand" href="/">Admin Panel</a>
+        <div class="collapse navbar-collapse justify-content-end">
+          <ul class="navbar-nav">
+            <li class="nav-item mt-2">
+              <span class="navbar-text text-light">Logged in as: Admin</span>
+            </li>
+            <li class="nav-item ms-3">
+              <a class="btn btn-danger" href="{{ url_for('auth.logout') }}"
+                >Logout</a
+              >
+            </li>
+          </ul>
+        </div>
+      </div>
+    </nav>
+    <div class="d-flex">
+      <!-- Sidebar -->
+      <nav class="bg-light sidebar vh-100">
+        <ul class="nav flex-column p-3">
+          <li class="nav-item mb-2">
+            <a
+              class="nav-link {% if page == 'dashboard' %}bg-secondary text-white{% else %}text-dark{% endif %}" style="border-radius: 0.5em;"
+              href="/"
+            >
+              Dashboard
+            </a>
+          </li>
+          <li class="nav-item mb-2">
+            <a
+              class="nav-link {% if page == 'users' %}bg-secondary text-white{% else %}text-dark{% endif %}" style="border-radius: 0.5em;"
+              href="{{ url_for('users.index') }}"
+            >
+              Manage Users
+            </a>
+          </li>
+          <li class="nav-item mb-2">
+            <a
+              class="nav-link {% if page == 'proxies' %}bg-secondary text-white{% else %}text-dark{% endif %}" style="border-radius: 0.5em;"
+              href="{{ url_for('proxy.index') }}"
+            >
+              Manage Proxies
+            </a>
+          </li>
+          <li class="nav-item mb-2">
+            <a
+              class="nav-link {% if page == 'assign_proxies' %}bg-secondary text-white{% else %}text-dark{% endif %}" style="border-radius: 0.5em;"
+              href="{{ url_for('proxy.assign_proxy') }}"
+            >
+              Assign Proxies to Users
+            </a>
+          </li>
+          <li class="nav-item mb-2">
+            <a
+              class="nav-link {% if page == 'assign_proxies_group' %}bg-secondary text-white{% else %}text-dark{% endif %}" style="border-radius: 0.5em;"
+              href="{{ url_for('proxy.assign_proxy_group') }}"
+            >
+              Assign Proxies to Groups
+            </a>
+          </li>
+          <li class="nav-item mb-2">
+            <a
+              class="nav-link {% if page == 'groups' %}bg-secondary text-white{% else %}text-dark{% endif %}" style="border-radius: 0.5em;"
+              href="{{ url_for('groups.list_groups') }}"
+            >
+              Manage Groups
+            </a>
+          </li>
+            <li class="nav-item mb-2">
+            <a
+              class="nav-link {% if page == 'login-content' %}bg-secondary text-white{% else %}text-dark{% endif %}" style="border-radius: 0.5em;"
+              href="{{ url_for('content.manage_login_content') }}"
+            >
+              Manage Login Page
+            </a>
+          </li>
+        </ul>
+      </nav>
+
+      <!-- Content -->
+      <main class="flex-grow-1 p-3">
+        <!-- Flashed Messages -->
+        {% with messages = get_flashed_messages(with_categories=true) %} {% if
+        messages %}
+        <div class="container">
+          {% for category, message in messages %}
+          <div
+            class="alert alert-{{ category }} alert-dismissible fade show"
+            role="alert"
+          >
+            {{ message }}
+            <button
+              type="button"
+              class="btn-close"
+              data-bs-dismiss="alert"
+              aria-label="Close"
+            ></button>
+          </div>
+          {% endfor %}
+        </div>
+        {% endif %} {% endwith %} {% block content %}{% endblock %}
+      </main>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  </body>
+</html>

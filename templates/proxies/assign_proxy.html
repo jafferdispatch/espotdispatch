@@ -1,0 +1,320 @@
+{% extends "base.html" %} {% block content %}
+    <h1 class="mb-4">Assign Proxy to Users</h1>
+
+    <!-- Section: Select Proxy -->
+    <div class="mb-5 card p-4">
+        <h3>Select Proxy to Assign</h3>
+        <input
+                type="text"
+                id="proxy-search"
+                class="form-control mb-3"
+                placeholder="Search Proxies..."
+        />
+        <div
+                class="table-responsive"
+                style="
+      min-height: 300px;
+      max-height: 300px;
+      overflow-y: auto;
+      border: 1px solid #dee2e6;
+      border-radius: 4px;
+    "
+        >
+            <table class="table table-striped" id="proxy-table">
+                <thead>
+                <tr>
+                    <th>Username</th>
+                    <th>Host</th>
+                    <th>Port</th>
+                    <th>Select</th>
+                </tr>
+                </thead>
+                <tbody>
+                {% for proxy in proxies %}
+                    <tr>
+                        <td>{{ proxy.username }}</td>
+                        <td>{{ proxy.host }}</td>
+                        <td>{{ proxy.port }}</td>
+                        <td>
+                            <button
+                                    class="btn btn-sm btn-primary select-proxy"
+                                    data-id="{{ proxy.id }}"
+                            >
+                                Select
+                            </button>
+                        </td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Section: Select Users -->
+    <div class="mb-5 card p-4">
+        <div class="d-flex gap-3">
+            <h3>Select Users</h3>
+            <div class="d-flex align-items-center mb-2">
+                <input type="checkbox" id="show-assigned" class="form-check-input me-2"/>
+                <label for="show-assigned" class="form-check-label"
+                >Show Already Assigned Users</label
+                >
+            </div>
+        </div>
+        <input
+                type="text"
+                id="user-search"
+                class="form-control mb-3"
+                placeholder="Search Users..."
+        />
+        <div
+                class="table-responsive"
+                style="
+      min-height: 300px;
+      max-height: 300px;
+      overflow-y: auto;
+      border: 1px solid #dee2e6;
+      border-radius: 4px;
+    "
+        >
+            <table class="table table-striped" id="user-table">
+                <thead>
+                <tr>
+                    <th>Username</th>
+                    <th>Email</th>
+                    <th>Select</th>
+                </tr>
+                </thead>
+                <tbody>
+                {% for user in users %}
+                    <tr class="user-row {% if user.proxy_id %}assigned{% endif %}">
+                        <td>{{ user.username }}</td>
+                        <td>{{ user.email }}</td>
+                        <td>
+                            <button
+                                    class="btn btn-sm btn-secondary select-user"
+                                    data-id="{{ user.id }}"
+                            >
+                                Add
+                            </button>
+                        </td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Section: Assigned Users -->
+    <div class="mb-5 card p-4">
+        <h3>You are going to assign the selected proxy to these Users</h3>
+        <div
+                class="table-responsive"
+                style="
+      min-height: 300px;
+      max-height: 300px;
+      overflow-y: auto;
+      border: 1px solid #dee2e6;
+      border-radius: 4px;
+    "
+        >
+            <table class="table table-striped" id="assigned-users-table">
+                <thead>
+                <tr>
+                    <th>Username</th>
+                    <th>Email</th>
+                    <th>Remove</th>
+                </tr>
+                </thead>
+                <tbody></tbody>
+            </table>
+        </div>
+
+
+        <!-- Confirmation Modal -->
+        <div class="modal fade" id="confirmationModal" tabindex="-1" aria-labelledby="confirmationModalLabel"
+             aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="confirmationModalLabel">Confirm Assignment</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        Are you sure you want to assign the proxy <strong id="modal-proxy-username"></strong> to the
+                        selected users?
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                        <button type="button" class="btn btn-primary" id="confirm-assign-btn">Confirm</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Success Modal -->
+        <div class="modal fade" id="successModal" tabindex="-1" aria-labelledby="successModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="successModalLabel">Success</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        Proxy successfully assigned to the selected users!
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-primary" data-bs-dismiss="modal">OK</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div>
+            <button id="assign-proxy-btn" class="btn btn-success mt-3" disabled>
+                Assign Proxy
+            </button>
+        </div>
+    </div>
+
+    <script>
+        // Proxy Search
+        document
+            .getElementById("proxy-search")
+            .addEventListener("input", function () {
+                let searchTerm = this.value.toLowerCase();
+                document
+                    .querySelectorAll("#proxy-table tbody tr")
+                    .forEach(function (row) {
+                        row.style.display = row.innerText.toLowerCase().includes(searchTerm)
+                            ? ""
+                            : "none";
+                    });
+            });
+
+        // User Search
+        document.getElementById("user-search").addEventListener("input", function () {
+            let searchTerm = this.value.toLowerCase();
+            document.querySelectorAll("#user-table tbody tr").forEach(function (row) {
+                row.style.display = row.innerText.toLowerCase().includes(searchTerm)
+                    ? ""
+                    : "none";
+            });
+        });
+
+        let selectedProxyId = null;
+        const assignedUsers = [];
+
+        // Select Proxy
+        document.querySelectorAll(".select-proxy").forEach(function (button) {
+            button.addEventListener("click", function () {
+                selectedProxyId = this.getAttribute("data-id");
+
+                // Reset all buttons
+                document.querySelectorAll(".select-proxy").forEach((btn) => {
+                    btn.classList.remove("btn-success");
+                    btn.textContent = "Select";
+                });
+
+                // Mark the clicked button as selected
+                this.classList.add("btn-success");
+                this.textContent = "Selected";
+
+                checkAssignButtonState();
+            });
+        });
+
+        // Select Users
+        document.querySelectorAll(".select-user").forEach(function (button) {
+            button.addEventListener("click", function () {
+                let userId = this.getAttribute("data-id");
+                let row = this.closest("tr");
+                if (!assignedUsers.includes(userId)) {
+                    assignedUsers.push(userId);
+                    let newRow = row.cloneNode(true);
+                    newRow.querySelector("button").textContent = "Remove";
+                    newRow
+                        .querySelector("button")
+                        .classList.replace("btn-secondary", "btn-danger");
+                    newRow.querySelector("button").addEventListener("click", function () {
+                        let removeId = this.getAttribute("data-id");
+                        assignedUsers.splice(assignedUsers.indexOf(removeId), 1);
+                        newRow.remove();
+                        checkAssignButtonState();
+                    });
+                    document
+                        .querySelector("#assigned-users-table tbody")
+                        .appendChild(newRow);
+                }
+                checkAssignButtonState();
+            });
+        });
+
+        // Enable/Disable Assign Button
+        function checkAssignButtonState() {
+            document.getElementById("assign-proxy-btn").disabled =
+                !selectedProxyId || assignedUsers.length === 0;
+        }
+
+        document.getElementById("assign-proxy-btn").addEventListener("click", function () {
+            // Populate modal details
+            const proxyUsername = document.querySelector(
+                `.select-proxy[data-id="${selectedProxyId}"]`
+            ).closest("tr").children[0].textContent;
+            document.getElementById("modal-proxy-username").textContent = proxyUsername;
+
+            const confirmationModal = new bootstrap.Modal(document.getElementById("confirmationModal"));
+            confirmationModal.show();
+        });
+
+        document.getElementById("confirm-assign-btn").addEventListener("click", function () {
+            fetch("{{ url_for('proxy.assign_proxy') }}", {
+                method: "POST",
+                headers: {"Content-Type": "application/json"},
+                body: JSON.stringify({
+                    proxy_id: selectedProxyId,
+                    user_ids: assignedUsers,
+                }),
+            })
+                .then((response) => response.json())
+                .then((data) => {
+                    if (data.success) {
+                        const successModal = new bootstrap.Modal(document.getElementById("successModal"));
+                        successModal.show();
+                    } else {
+                        alert("Error assigning proxy!");
+                    }
+                });
+
+            // Close the confirmation modal
+            const confirmationModal = bootstrap.Modal.getInstance(document.getElementById("confirmationModal"));
+            confirmationModal.hide();
+        });
+
+
+        document.addEventListener("DOMContentLoaded", function () {
+            const showAssignedCheckbox = document.getElementById("show-assigned");
+            const userRows = document.querySelectorAll(".user-row");
+
+            showAssignedCheckbox.addEventListener("change", function () {
+                userRows.forEach((row) => {
+                    if (row.classList.contains("assigned")) {
+                        row.style.display = showAssignedCheckbox.checked ? "" : "none";
+                    }
+                });
+            });
+
+            // Initial state: hide assigned users
+            userRows.forEach((row) => {
+                if (row.classList.contains("assigned")) {
+                    row.style.display = "none";
+                }
+            });
+        });
+
+        document.getElementById("successModal").addEventListener("hidden.bs.modal", function () {
+            location.reload();
+        });
+
+    </script>
+{% endblock %}

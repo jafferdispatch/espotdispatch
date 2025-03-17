@@ -1,0 +1,49 @@
+{% extends "base.html" %} {% block content %}
+<h1 class="mb-4">Edit Proxy</h1>
+<form method="post">
+  <div class="mb-3">
+    <label for="username" class="form-label">Username</label>
+    <input
+      type="text"
+      class="form-control"
+      id="username"
+      name="username"
+      value="{{ proxy.username }}"
+      required
+    />
+  </div>
+  <div class="mb-3">
+    <label for="password" class="form-label">Password</label>
+    <input
+      type="password"
+      class="form-control"
+      id="password"
+      name="password"
+      placeholder="Enter new password if you want to change it"
+    />
+  </div>
+  <div class="mb-3">
+    <label for="host" class="form-label">Host</label>
+    <input
+      type="text"
+      class="form-control"
+      id="host"
+      name="host"
+      value="{{ proxy.host }}"
+      required
+    />
+  </div>
+  <div class="mb-3">
+    <label for="port" class="form-label">Port</label>
+    <input
+      type="text"
+      class="form-control"
+      id="port"
+      name="port"
+      value="{{ proxy.port }}"
+      required
+    />
+  </div>
+  <button type="submit" class="btn btn-primary">Update Proxy</button>
+</form>
+{% endblock %}

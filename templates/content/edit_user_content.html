@@ -1,0 +1,31 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container mt-5">
+    <h2 class="my-4">Edit Content for user <strong>"{{ user.username }}"</strong></h2>
+    <form method="POST">
+{#        <div class="form-group my-4">#}
+{#            <label for="logo_url">Logo URL</label>#}
+{#            <input type="text" class="form-control" id="logo_url" name="logo_url" value="{{ content.logo_url if content else '' }}">#}
+{#        </div>#}
+{#        <div class="form-group my-4">#}
+{#            <label for="phone_number">Phone Number</label>#}
+{#            <input type="text" class="form-control" id="phone_number" name="phone_number" value="{{ content.phone_number if content else '' }}">#}
+{#        </div>#}
+        <div class="form-group my-4">
+            <label for="default_url">Default URL</label>
+            <input type="text" class="form-control" id="default_url" name="default_url" value="{{ content.default_url if content else '' }}">
+        </div>
+        <div class="form-group my-4">
+            <label for="closing_dialog">Closing Dialog</label>
+            <input type="text" class="form-control" id="closing_dialog" name="closing_dialog" value="{{ content.closing_dialog if content else '' }}">
+        </div>
+        <div class="form-group my-4">
+            <label for="unassigned_proxy_error_dialog">Unassigned Proxy Error Dialog</label>
+            <input type="text" class="form-control" id="unassigned_proxy_error_dialog" name="unassigned_proxy_error_dialog" value="{{ content.unassigned_proxy_error_dialog if content else '' }}">
+        </div>
+        <button type="submit" class="btn btn-success mt-3">Save Changes</button>
+        <a href="{{ url_for('content.manage_user_content', user_id=user.id) }}" class="btn btn-secondary mt-3">Cancel</a>
+    </form>
+</div>
+{% endblock %}

@@ -1,0 +1,17 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container mt-5">
+    <h2 class="my-5">Manage Content for user <strong>"{{ user.username }}"</strong></h2>
+    {% if content %}
+{#        <p><strong>Phone Number:</strong> {{ content.phone_number }}</p>#}
+{#        <p><strong>Logo URL:</strong> {{ content.logo_url }}</p>#}
+        <p><strong>Default URL:</strong> {{ content.default_url }}</p>
+        <p><strong>Closing dialog:</strong> {{ content.closing_dialog }}</p>
+        <p><strong>Unassigned proxy error dialog:</strong> {{ content.unassigned_proxy_error_dialog }}</p>
+    {% else %}
+        <p>No content available for this user.</p>
+    {% endif %}
+    <a href="{{ url_for('content.edit_user_content', user_id=user.id) }}" class="btn btn-primary my-4">Edit Content</a>
+</div>
+{% endblock %}

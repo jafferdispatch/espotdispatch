@@ -1,0 +1,29 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container mt-5">
+    <h2 class="my-4">Edit Content for the Login Screen</h2>
+    <form method="POST">
+
+        <div class="form-group my-4">
+            <label for="logo_url">Logo URL</label>
+            <input type="text" class="form-control" id="logo_url" name="logo_url" value="{{ content.logo_url if content else '' }}">
+        </div>
+        <div class="form-group my-4">
+            <label for="phone_number">Phone Number</label>
+            <input type="text" class="form-control" id="phone_number" name="phone_number" value="{{ content.phone_number if content else '' }}">
+        </div>
+        <div class="form-group my-4">
+            <label for="slogan">Slogan</label>
+            <input type="text" class="form-control" id="slogan" name="slogan" value="{{ content.slogan if content else '' }}">
+        </div>
+        <div class="form-group my-4">
+            <label for="contact_line">Contact Line</label>
+            <input type="text" class="form-control" id="contact_line" name="contact_line" value="{{ content.contact_line if content else '' }}">
+        </div>
+
+        <button type="submit" class="btn btn-success mt-3">Save Changes</button>
+        <a href="{{ url_for('content.manage_login_content') }}" class="btn btn-secondary mt-3">Cancel</a>
+    </form>
+</div>
+{% endblock %}

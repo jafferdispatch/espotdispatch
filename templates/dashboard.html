@@ -1,0 +1,132 @@
+{% extends "base.html" %} {% block content %}
+<h1 class="mb-4">Dashboard</h1>
+<div class="row">
+  <div class="col-md-6">
+    <div class="card text-white bg-primary mb-3">
+      <div class="card-body">
+        <h5 class="card-title">Users</h5>
+        <p class="card-text">Total Users: {{ num_users }}</p>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-6">
+    <div class="card text-white bg-success mb-3">
+      <div class="card-body">
+        <h5 class="card-title">Proxies</h5>
+        <p class="card-text">Total Proxies: {{ num_proxies }}</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="row">
+  <!-- Manage Users -->
+  <div class="col-md-4 d-flex">
+    <a href="{{ url_for('users.index') }}" class="text-decoration-none w-100">
+      <div class="card shadow-sm border-0 hover-card h-100">
+        <div
+          class="card-body text-center d-flex flex-column align-items-center justify-content-center"
+        >
+          <i class="fas fa-users-cog fa-3x text-primary mb-3"></i>
+          <h5 class="card-title">Manage Users</h5>
+          <p class="card-text">Add, update, or delete users from the system.</p>
+        </div>
+      </div>
+    </a>
+  </div>
+
+  <!-- Manage Proxies -->
+  <div class="col-md-4 d-flex">
+    <a href="{{ url_for('proxy.index') }}" class="text-decoration-none w-100">
+      <div class="card shadow-sm border-0 hover-card h-100">
+        <div
+          class="card-body text-center d-flex flex-column align-items-center justify-content-center"
+        >
+          <i class="fas fa-server fa-3x text-success mb-3"></i>
+          <h5 class="card-title">Manage Proxies</h5>
+          <p class="card-text">
+            Add, update, or delete proxy information from the system.
+          </p>
+        </div>
+      </div>
+    </a>
+  </div>
+
+  <div class="col-md-4 d-flex">
+    <a
+      href="{{ url_for('groups.list_groups') }}"
+      class="text-decoration-none w-100"
+    >
+      <div class="card shadow-sm border-0 hover-card h-100">
+        <div
+          class="card-body text-center d-flex flex-column align-items-center justify-content-center"
+        >
+          <i class="fas fa-users-cog fa-3x text-primary mb-3"></i>
+          <h5 class="card-title">Manage Groups</h5>
+          <p class="card-text">Add, update, or delete users in groups.</p>
+        </div>
+      </div>
+    </a>
+  </div>
+</div>
+
+<div class="row mt-3">
+  <!-- Assign Proxies -->
+  <div class="col-md-4 d-flex">
+    <a
+      href="{{ url_for('proxy.assign_proxy') }}"
+      class="text-decoration-none w-100"
+    >
+      <div class="card shadow-sm border-0 hover-card h-100">
+        <div
+          class="card-body text-center d-flex flex-column align-items-center justify-content-center"
+        >
+          <i class="fas fa-random fa-3x text-warning mb-3"></i>
+          <h5 class="card-title">Assign Proxies to individual users</h5>
+          <p class="card-text">Assign or unassign proxies to users.</p>
+        </div>
+      </div>
+    </a>
+  </div>
+
+  <!-- Assign Proxies to Groups -->
+  <div class="col-md-4 d-flex">
+    <a
+      href="{{ url_for('proxy.assign_proxy_group') }}"
+      class="text-decoration-none w-100"
+    >
+      <div class="card shadow-sm border-0 hover-card h-100">
+        <div
+          class="card-body text-center d-flex flex-column align-items-center justify-content-center"
+        >
+          <i class="fas fa-random fa-3x text-warning mb-3"></i>
+          <h5 class="card-title">Assign Proxies to Groups</h5>
+          <p class="card-text">
+            Assign or unassign proxies to users in a group.
+          </p>
+        </div>
+      </div>
+    </a>
+  </div>
+</div>
+
+<style>
+  .hover-card {
+    transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+  }
+
+  .hover-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+  }
+
+  .hover-card i {
+    transition: color 0.2s ease-in-out;
+  }
+
+  .hover-card:hover i {
+    color: #0d6efd; /* Bootstrap primary color */
+  }
+</style>
+
+{% endblock %}

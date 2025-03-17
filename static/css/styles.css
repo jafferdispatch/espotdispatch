@@ -1,0 +1,8 @@
+.sidebar {
+  width: 200px;
+  height: 100vh;
+}
+
+.table-hover tbody tr:hover {
+  background-color: #f2f2f2;
+}
